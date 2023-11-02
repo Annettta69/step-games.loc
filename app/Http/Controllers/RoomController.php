@@ -36,7 +36,7 @@ class RoomController extends Controller
         $existingRoom = Room::where('user_id', $user_id)->first(); //используется для выполнения запроса к базе данных с целью проверки наличия комнаты для конкретного пользователя
 
         if ($existingRoom) {
-            return response()->json(['message' => 'У вас уже есть комната'], 400);
+            return response()->json(['message' => 'У вас уже есть комната'], 400) ;
         }
         else {
             $newRoom = Room::create([
