@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\RoomController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -31,3 +32,5 @@ Route::group(['prefix' => 'auth'], function () {
 
 Route::resource('/rooms', \App\Http\Controllers\RoomController::class)->middleware('auth:sanctum');
 Route::get('/me',\App\Http\Controllers\MeController::class)->middleware('auth:sanctum');
+
+Route::get('/list', [RoomController::class, 'index'])->middleware('auth:sanctum');

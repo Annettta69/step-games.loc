@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Room;
+use App\Models\User;
 use Illuminate\Http\Request;
 
 class RoomController extends Controller
@@ -10,11 +11,13 @@ class RoomController extends Controller
     /**
      * Display a listing of the resource.
      *
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\JsonResponse|\Illuminate\Http\Response
      */
     public function index()
     {
-        //
+        $rooms = Room::all();
+
+    return response()->json($rooms, 200);
     }
 
     /**
@@ -26,23 +29,34 @@ class RoomController extends Controller
     public function store(Request $request)
     {
         $name = $request->get('name');
-        $capacity = $request->get('capacity');
-        $type = $request->get('type');
-        $user_id = auth()->user()->id;
-        return Room::create([
-            'name'=> $name,
-            'capacity' => $capacity,
-            'type' => $type,
-            'user_id' => $user_id
-        ]);
+        $capacity=$request->get('capacity');
+        $type=$request->get('type');
+        $user_id=auth()->user()->id;
+
+        $existingRoom = Room::where('user_id', $user_id)->first(); //используется для выполнения запроса к базе данных с целью проверки наличия комнаты для конкретного пользователя
+
+        if ($existingRoom) {
+            return response()->json(['message' => 'У вас уже есть комната'], 400);
+        }
+        else {
+            $newRoom = Room::create([
+                'name' => $name,
+                'capacity' => $capacity,
+                'type' => $type,
+                'user_id' => $user_id
+            ]);
+
+            return response()->json($newRoom, 201); // Возвращаем созданную комнату с кодом 201 (Created)
+        }
+
     }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
+            /**
+             * Display the specified resource.
+             *
+             * @param  int  $id
+             * @return \Illuminate\Http\Response
+             */
     public function show($id)
     {
         return Room::find($id);
@@ -68,8 +82,8 @@ class RoomController extends Controller
      */
     public function destroy($id)
     {
-
         $room = Room::find($id);
         $room->delete();
     }
+
 }
