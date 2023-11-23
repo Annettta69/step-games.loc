@@ -19,18 +19,24 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
-
-
-Route::middleware('auth:sanctum')->get('/login', function (Request $request) {
-    return response()->json(['login' => $request->user()->login]);
-});
-
 Route::group(['prefix' => 'auth'], function () {
     Route::Post('/registration', \App\Http\Controllers\RegisterController::class);
     Route::Post('/login', \App\Http\Controllers\LoginController::class);
 });
 
-Route::resource('/rooms', \App\Http\Controllers\RoomController::class)->middleware('auth:sanctum');
+//rooms
+Route::group(['prefix' => 'rooms', 'middleware' => 'auth:sanctum'], function () {
+    Route::post('{room}/step', [RoomController::class, 'createStep']);
+    Route::resource('/', RoomController::class);
+    Route::post('/enter/{room}', [RoomController::class, 'enter']);
+    Route::post('/leave/{room}', [RoomController::class, 'leave']);
+});
+
+
 Route::get('/me',\App\Http\Controllers\MeController::class)->middleware('auth:sanctum');
 
 Route::get('/list', [RoomController::class, 'index'])->middleware('auth:sanctum');
+
+Route::middleware('auth:sanctum')->get('/login', function (Request $request) {
+    return response()->json(['login' => $request->user()->login]);
+});
